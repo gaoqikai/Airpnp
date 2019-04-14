@@ -4,14 +4,12 @@
 <head>
 	<title>Airpnp</title>
 	<meta charset="UTF-8">
-	<!--   <meta name="discription" content="Something about pets">
-
-	<title>Login Page</title> -->
+	<meta name="discription" content="Something about pets">
+	<title>Login Page</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel='stylesheet' href='/stylesheets/style.css' />
-
+	<script src="javascripts/indexScript.js"></script>
 </head>
-<!--comments here-->
 
 <body class="subpage">
 	<header id="header">
@@ -20,7 +18,12 @@
 				<font size="+3"><strong>Airpnp</strong></font>
 			</a>
 			<nav id="nav">
+				<% if (result.length) {%>
+				<a>Logged in as: <%= result[0].username%></a>
+				<a href='index?action=logout'>Logout</a>
+				<% } else { %>
 				<a href="login">Login</a>
+				<%}%>
 				<a href="signup">Signup</a>
 				<a href="listings">My listings</a>
 				<a href="biddings">My biddings</a>
@@ -37,37 +40,19 @@
 			<h3>Find out a second home for your pet</h3>
 			<h2>when you are on leave</h2>
 		</div>
+		<input type="hidden" id='query'>
+
+		<script>
+			document.getElementById("query").value = getQuery();
+		</script>
 	</footer>
 
 	<section id="three">
 		<div class="inner">
 			<br><br>
 			<!-- filtering information -->
-			<h3>Filter</h3>
-			<form method="post" action="#">
-				<div class="row">
-					<!-- sorting information -->
-					<div class="align-center">
-						<input type="checkbox" id="priceHighToLow" name="priceHighToLow">
-						<label for="priceHighToLow">Price High to Low</label>
-					</div>
-
-					<div class="align-center">
-						<input type="checkbox" id="priceLowToHigh" name="priceLowToHigh">
-						<label for="priceLowToHigh">Price Low to High</label>
-					</div>
-
-					<div class="align-center">
-						<input type="checkbox" id="rating" name="rating">
-						<label for="rating">Rating</label>
-					</div>
-
-					<div class="align-center">
-						<input type="checkbox" id="favourite" name="favourite">
-						<label for="favourite">Favourite</label>
-					</div>
-				</div>
-
+			<h3>Constraints:</h3>
+			<form method="get" action="/constrain" id="constrain_form">
 				<!-- filtering information -->
 				<div class="field half first">
 					<label>Low Price</label>
@@ -81,54 +66,88 @@
 
 				<div class="field half first">
 					<label>Start Time</label>
-					<input type="text" name="startTime" id="startTime" placeholder="Start Time" />
+					<input type="text" name="startTime" id="startTime" placeholder="MM/DD/YYYY" />
 				</div>
 
 				<div class="field half">
 					<label>End Time</label>
-					<input type="text" name="endTime" id="endTime" placeholder="End Time" />
+					<input type="text" name="endTime" id="endTime" placeholder="MM/DD/YYYY" />
 				</div>
 
 				<div class="field">
-					<label>Minimum Capacity</label>
+					<label>Capacity</label>
 					<input type="text" name="capacity" id="capacity" placeholder="Capacity" />
 				</div>
 
 				<!-- search button -->
-				<ul class="actions">
-					<li><input type="submit" value="Send Message"/></li>
-					<li><input class="button special" type="reset" value="Reset" /></li>
-				</ul>
 			</form>
-<br><br>
-			<h3>All listings</h3>
-
+			<ul class="actions">
+				<li><input type="button" value="by money" onclick="priceAddress()" /></li>
+				<li><input type="button" value="by time" onclick="dateAddress()" /></li>
+				<li><input type="button" value="by capacity" onclick="capacityAddress()" /></li>
+				<li><input class="button special" type="reset" value="Reset" /></li>
+			</ul>
+			<h3>Sort by:</h3>
 			<div class="table-wrapper">
-				<table>
+				<ul class="actions">
+					<li><input type="button" value="price" onclick="priceSortAddress()" /></li>
+					<li><input type="button" value="start date" onclick="dateStartAddress()" /></li>
+					<li><input type="button" value="end date" onclick="dateEndAddress()" /></li>
+					<li><input type="button" value="capacity" onclick="capacitySortAddress()" /></li>
+				</ul>
+				<h3>All services:</h3>
+				<table id="listings">
 					<thead>
 						<tr>
-							<th scope="col">Host Name</th>
-							<th scope="col">Minimum Bid</th>
-							<th scope="col">Start Date</th>
-							<th scope="col">End Date</th>
-							<th scope="col">Capacity</th>
+							<th scope="col">
+								<font size="+1">Host Name</font>
+							</th>
+							<th scope="col">
+								<font size="+1">Minimum Bid</font>
+							</th>
+							<th scope="col">
+								<font size="+1">Start Date</font>
+							</th>
+							<th scope="col">
+								<font size="+1">End Date</font>
+							</th>
+							<th scope="col">
+								<font size="+1">Capacity</font>
+							</th>
+							<th scope="col"></th>
 						</tr>
 					</thead>
 					<tbody>
 						<% for(var i=0; i<data.length; i++) { %>
-				<tr>
-					<td><%= data[i].hostname%></td>
-					<td><%= data[i].minbid%></td>
-					<td><%= data[i].startdate%></td>
-					<td><%= data[i].enddate%></td>
-					<td><%= data[i].capacity%></td>
-				</tr>
-				<% } %>
-					</tbody>
-				</table>
-			</div>
-		</div>
-</body>
 
+				<tr>
+					<td>
+						<font size="+1"><%= data[i].hostname%></font>
+					</td>
+					<td>
+						<font size="+1"><%= data[i].minbid%></font>
+					</td>
+					<td>
+						<font size="+1"><%= data[i].startdate.toString().split(' ').slice(0, 4).join(' ')%>
+						</font>
+					</td>
+					<td>
+						<font size="+1"><%= data[i].enddate.toString().split(' ').slice(0, 4).join(' ')%></font>
+					</td>
+					<td>
+						<font size="+1"><%= data[i].capacity%></font>
+					</td>
+					<td><a href=<%= "ownerview?id=" + data[i].id%> class="button special small fit">Check it
+							out!</a></td>
+				</tr>
+
+				<% } %>
+				</tbody>
+				</table>
+
+		</div>
+		</div>
+		</section>
+</body>
 
 </html>

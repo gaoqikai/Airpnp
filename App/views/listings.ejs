@@ -18,7 +18,13 @@
 				<font size="+3"><strong>Airpnp</strong></font>
 			</a>
 			<nav id="nav">
+				<% if (result.length) {%>
+				<!--if no one logged in, do not display-->
+				<a>Logged in as: <%= result[0].username%></a>
+				<a href='index?action=logout'>Logout</a>
+				<% } else { %>
 				<a href="login">Login</a>
+				<%}%>
 				<a href="signup">Signup</a>
 				<a href="listings">My listings</a>
 				<a href="biddings">My biddings</a>
@@ -29,63 +35,133 @@
 			<a href="#navPanel" class="navPanelToggle"><span class="fa fa-bars"></span></a>
 		</div>
 	</header>
+	<% if (!result.length) {%>
+				<h4><center>You have not log in yet. Please log in first.</center></h4>
 
-	<footer id="footer">
-		<div class="inner">
-			<h3> Create a new listing </h3>
+				<% } else {%>
+				<footer id="footer">
+					<div class="inner">
+						<h3> Create a new listing </h3>
 
-			<form action="#" method="post">
-				<div class="field half first">
-					<label for="Start date">Start date</label>
-					<input name="startDate" id="startDate" type="text" placeholder="Start date">
+						<form action="#" method="post">
+							<div class="first field half">
+								<label for="Start date">Start date</label>
+								<input name="startDate" id="startDate" type="text" placeholder="Start date">
+							</div>
+
+							<div class="field half">
+								<label for="End date">End date</label>
+								<input name="endDate" id="endDate" type="text" placeholder="End date">
+							</div>
+
+							<div class="first field half">
+								<label for="Min bid">Min bid</label>
+								<input name="minBid" id="minBid" type="text" placeholder="Min bid">
+							</div>
+
+							<div class="field half">
+								<label for="Capacity">Capacity</label>
+								<input name="capacity" id="capacity" type="text" placeholder="Capacity of your home">
+							</div>
+
+							<div class="12u$">
+								<label for="Bonus">Special Bonus</label>
+								<div class="select-wrapper">
+									<select name="bonus" id="bonus">
+										<option value="">- Bonus -</option>
+										<option value="walk">Will help walk the pet</option>
+										<option value="shower">Will help pet take showers</option>
+										<option value="beauty">Will arange and beauty the pet</option>
+										<option value="None">None</option>
+									</select>
+								</div>
+							</div>
+
+
+
+
+							<br />
+							<ul class="actions">
+								<li><input value="Create listing" class="button alt" type="submit"></li>
+							</ul>
+						</form>
+					</div>
+				</footer>
+
+				<br><br>
+				<!-- Show listings here -->
+				<div class="inner">
+					<div class="align-center">
+						<h3>
+							<font size="+3">Your active listings</font>
+						</h3>
+					</div>
+					<!-- <div class="table-wrapper" , style="padding-left: 100px; padding-right: 100px"> -->
+					<%if(data.length) {%>
+						<div class="table-wrapper">
+						<table id="listings">
+							<thead>
+								<tr>
+									<th scope="col">
+										<font size="+1">POST ID</font>
+									</th>
+									<th scope="col">
+										<font size="+1">Minimum Bid</font>
+									</th>
+									<th scope="col">
+										<font size="+1">Start Date</font>
+									</th>
+									<th scope="col">
+										<font size="+1">End Date</font>
+									</th>
+									<th scope="col">
+										<font size="+1">Capacity</font>
+									</th>
+									<th scope="col">
+										<font size="+1">Special Bonus</font>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% for(var i=0; i<data.length; i++) { %>
+								<tr>
+									<td>
+										<font size="+1"><%= data[i].id%></font>
+									</td>
+									<td>
+										<font size="+1"><%= data[i].minbid%></font>
+									</td>
+									<td>
+										<font size="+1">
+											<%= data[i].startdate.toString().split(' ').slice(0, 4).join(' ')%></font>
+									</td>
+									<td>
+										<font size="+1">
+											<%= data[i].enddate.toString().split(' ').slice(0, 4).join(' ')%></font>
+									</td>
+									<td>
+										<font size="+1"><%= data[i].capacity%></font>
+									</td>
+									<td>
+										<% if (!data[i].bonus) {%>
+										<font size="+1">None</font>
+										<%} else {%>
+										<font size="+1"><%= data[i].bonus%></font>
+										<%}%>
+									</td>
+									<td><a href=<%= "takerview?id=" + data[i].id%>
+										class="button special small fit">Bidding Infomation</a></td>
+								</tr>
+
+								<% } %>
+							</tbody>
+						</table>
+					</div>
+					<%}else {%>
+						<h4><center>Haven't posted? Try now!</h4>
+					<%}%>
 				</div>
-
-				<div class="field half">
-					<label for="End date">End date</label>
-					<input name="endDate" id="endDate" type="text" placeholder="End date">
-				</div>
-
-				<div class="field">
-					<label for="Min bid">Min bid</label>
-					<input name="minBid" id="minBid" type="text" placeholder="Min bid">
-				</div>
-
-				<br />
-				<ul class="actions">
-					<li><input value="Create listing" class="button alt" type="submit"></li>
-				</ul>
-			</form>
-		</div>
-	</footer>
-
-	<br><br>
-
-	<div class="wrapper align-center">
-		<h3>
-			<font size="+3">Your active listings</font>
-		</h3>
-		<div class="table-wrapper" , style="padding-left: 100px; padding-right: 100px">
-			<table>
-				<thead>
-					<tr>
-						<th scope="col">Minimum Bid</th>
-						<th scope="col">Start Date</th>
-						<th scope="col">End Date</th>
-						<th scope="col">Capacity</th>
-					</tr>
-				</thead>
-				<tbody style: align="left">
-					<% for(var i=0; i<data.length; i++) { %>
-					<tr>
-						<td><%= data[i].minbid%></td>
-						<td>convert(data[i].startdate)</td>
-						<td><%= data[i].enddate%></td>
-						<td><%= data[i].capacity%></td>
-					</tr>
-					<% } %>
-				</tbody>
-			</table>
-		</div>
+				<%}%>
 </body>
 
 </html>
